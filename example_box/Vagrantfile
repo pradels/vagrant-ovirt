@@ -1,0 +1,22 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = 'ovirt'
+
+  #config.vm.define :test_vm do |test_vm|
+  #  test_vm.vm.provider :ovirt do |ovirt|
+  #    ovirt.template = "Template name"
+  #    ovirt.quota = "Quota name"
+  #    ovirt.cpus = 1
+  #    ovirt.memory = 512
+  #  end
+  #end
+
+  #config.vm.provider :ovirt do |ovirt|
+  #  ovirt.url = "https://ovirt.example.com:443"
+  #  ovirt.username = "Username"
+  #  ovirt.password = "Secret"
+  #  ovirt.datacenter = "Datacenter name"
+  #end
+end

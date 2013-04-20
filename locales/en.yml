@@ -1,0 +1,82 @@
+en:
+  vagrant_ovirt:
+    creating_vm: |-
+      Creating VM with the following settings...
+    destroy_vm: |-
+      Removing VM...
+    not_created: |-
+      VM is not created. Please run `vagrant up` first.
+    starting_vm: |-
+      Starting VM.
+    error_recovering: |-
+      An error occured. Recovering..
+    waiting_for_ip: |-
+      Waiting for VM to get an IP address...
+    waiting_for_ssh: |-
+      Waiting for SSH to become available...
+    rsync_folder: |-
+      Rsyncing folder: %{hostpath} => %{guestpath}
+    wait_for_ready_vm: |-
+      Waiting for VM to become "ready" to start...
+    already_created: |-
+      VM is already created.
+    ready: |-
+      Machine is booted and ready for use!
+
+    errors:
+      fog_ovirt_connection_error: |-
+        Error while connecting to oVirt: %{error_message}
+      no_datacenter_error: |-
+        No usable datacenter found! Please check if datacenter specified in
+        configuration is avaliable.
+      no_cluster_error: |-
+        No usable cluster found! Please check if cluster specified in
+        configuration is avaliable.
+      no_quota_error: |-
+        No usable quota found! Please check if quota specified in
+        configuration is avaliable.
+      no_template_error: |-
+        No template %{template_name} found!
+      fog_create_server_error: |-
+        Error while creating domain: %{error_message}
+      interface_slot_not_available: |-
+        Interface adapter number is already in use. Please specify other adapter
+        number.
+      add_interface_error: |-
+        Error while adding new interface to VM. %{error_message}
+      no_vm_error: |-
+        No VM %{vm_name} found.
+      no_network_error: |-
+        No network %{network_name} found.
+      start_vm_error: |-
+        Unable to start VM: %{error_message}
+      no_ip_address_error: |-
+        No IP address found.
+      rsync_error: |-
+        There was an error when attemping to rsync a share folder.
+        Please inspect the error message below for more info.
+
+        Host path: %{hostpath}
+        Guest path: %{guestpath}
+        Error: %{stderr}
+
+    states:
+      short_paused: |-
+        pause
+      short_shutoff: |-
+        shutoff
+      long_shutoff: |-
+        The oVirt machine is not running. Run `vagrant up` to start it.
+      short_down: |-
+        shutoff
+      long_down: |-
+        The oVirt machine is not running. Run `vagrant up` to start it.
+      short_not_created: |-
+        not created
+      long_not_created: |-
+        The oVirt domain is not created. Run `vagrant up` to create it.
+      short_running: |-
+        running
+      long_running: |-
+        The oVirt domain is running. To stop this machine, you can run
+        `vagrant halt`. To destroy the machine, you can run `vagrant destroy`.
