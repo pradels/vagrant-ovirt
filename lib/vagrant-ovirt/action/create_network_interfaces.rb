@@ -1,10 +1,12 @@
 require 'log4r'
+require 'vagrant/util/scoped_hash_override'
 
 module VagrantPlugins
   module OVirtProvider
     module Action
       # Create network interfaces for machine, before VM is running.
       class CreateNetworkInterfaces
+        include Vagrant::Util::ScopedHashOverride
 
         def initialize(app, env)
           @logger = Log4r::Logger.new("vagrant_ovirt::action::create_network_interfaces")
@@ -29,11 +31,17 @@ module VagrantPlugins
           adapters[0] = :reserved
 
           env[:machine].config.vm.networks.each do |type, options|
-            # Other types than bridged are not supported for now.
-            next if type != :bridged
+            # We support private and public networks only. They mean both the
+            # same right now.
+            next if type != :private_network and type != :public_network
 
-            network_name = 'rhevm'
-            network_name = options[:bridge] if options[:bridge]
+            # Get options for this interface. Options can be specified in
+            # Vagrantfile in short format (:ip => ...), or provider format
+            # (:ovirt__network_name => ...).
+            options = scoped_hash_override(options, :ovirt)
+            options = { :network_name => 'rhevm' }.merge(options)
+
+            network_name = options[:network_name]
 
             if options[:adapter]
               if adapters[options[:adapter]]
