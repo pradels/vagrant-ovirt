@@ -17,12 +17,13 @@ module VagrantPlugins
               next
             end
 
-            # Create and start VM if not yet created.
             b2.use SetNameOfDomain
             b2.use CreateVM
-            b2.use CreateNetworkInterfaces
 
             b2.use TimedProvision
+            b2.use CreateNetworkInterfaces
+
+            b2.use SetHostname
             b2.use StartVM
             b2.use WaitTillUp
             b2.use SyncFolders

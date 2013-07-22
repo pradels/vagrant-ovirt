@@ -8,10 +8,10 @@ allowing Vagrant to control and provision machines in oVirt and RHEV.
 In this document, both oVirt and RHEV names are used interchangeably and
 represent the same platform on top of which this provider should work.
 
-**Note:** Actual version (0.0.1) is still a development one. It was developed
+**Note:** Actual version (0.0.2) is still a development one. It was developed
 and tested on RHEV 3.1 only.
 
-## Features (Version 0.0.1)
+## Features (Version 0.0.2)
 
 * Vagrant `up` and `destroy` commands.
 * Create and boot oVirt machines from templates.
@@ -54,6 +54,9 @@ your information where necessary.
 Vagrant.configure("2") do |config|
   config.vm.define :test_vm do |test_vm|
     test_vm.vm.box = "ovirt"
+    test_vm.vm.network :private_network,
+      :ip => '10.20.30.40',
+      :ovirt__network_name => 'ovirt_network',
 
     test_vm.vm.provider :ovirt do |ovirt|
       ovirt.template = "Template name"
@@ -137,22 +140,28 @@ Vagrant goes through steps below when creating new project:
 6.	Sync folders via `rsync` and run Vagrant provisioner on new domain if
 	setup in Vagrantfile.
 
-## Networks
+## Network Interfaces
 
-Networking features in the form of `config.vm.network` are supported only
-in bridged format, no hostonly network is supported in current version of
-provider.
+Networking features in the form of `config.vm.network` support private networks
+concept. No public network or port forwarding are supported in current version
+of provider.
 
-Example of network interface definition:
+An examples of network interface definitions:
 
 ```ruby
-  config.vm.define :test_vm do |test_vm|
-    test_vm.vm.network :bridged, :bridge => "rhevm", :adapter => 1
+  config.vm.define :test_vm1 do |test_vm1|
+    test_vm1.vm.network :private_network,
+      :ip      => "10.20.30.40",
+      :netmask => "255.255.255.0",
+      :ovirt__network_name => "ovirt_networkname"
   end
 ```
 
-In example above, bridged network adapter connected to network `rhevm` is
-defined.
+In example below, one additional network interface is created for VM test_vm1.
+Interface is connected to `ovirt_networkname` network and configured to ip
+address `10.20.30.40/24`. If you omit ip address, interface will be configured
+dynamicaly via dhcp.
+
 
 ## Obtaining Domain IP Address
 

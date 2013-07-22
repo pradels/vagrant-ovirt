@@ -28,7 +28,9 @@ module VagrantPlugins
 
           # First interface is for provisioning, so this slot is not usable.
           # This interface should be available already from template.
-          adapters[0] = :reserved
+          adapters[0] = {
+            :network_name => 'rhevm'
+          }
 
           env[:machine].config.vm.networks.each do |type, options|
             # We support private and public networks only. They mean both the
@@ -39,36 +41,40 @@ module VagrantPlugins
             # Vagrantfile in short format (:ip => ...), or provider format
             # (:ovirt__network_name => ...).
             options = scoped_hash_override(options, :ovirt)
-            options = { :network_name => 'rhevm' }.merge(options)
-
-            network_name = options[:network_name]
+            options = {
+              :netmask      => '255.255.255.0',
+              :network_name => 'rhevm'
+            }.merge(options)
 
             if options[:adapter]
               if adapters[options[:adapter]]
                 raise Errors::InterfaceSlotNotAvailable
               end
 
-              adapters[options[:adapter].to_i] = network_name
+              free_slot = options[:adapter].to_i
             else
-              empty_slot = find_empty(adapters, start=1)
-              raise Errors::InterfaceSlotNotAvailable if empty_slot == nil
+              free_slot = find_empty(adapters, start=1)
+              raise Errors::InterfaceSlotNotAvailable if free_slot == nil
+            end
 
-              adapters[empty_slot] = network_name
-            end           
+            adapters[free_slot] = options
           end
 
           # Create each interface as new domain device
-          adapters.each_with_index do |network_name, slot_number|
-            next if network_name == :reserved
+          adapters.each_with_index do |opts, slot_number|
+            next if slot_number == 0
             iface_number = slot_number + 1
+
+            #require 'pp'
+            #pp env[:ovirt_client].networks(:cluster => env[:ovirt_cluster].id)
 
             # Get network id
             network = OVirtProvider::Util::Collection.find_matching(
-              env[:ovirt_client].networks(:cluster => env[:ovirt_cluster].id),
-              network_name)
+              env[:ovirt_client].networks(:cluster_id => env[:ovirt_cluster].id),
+              opts[:network_name])
             if network == nil
               raise Errors::NoNetworkError,
-                :network_name => network_name
+                :network_name => opts[:network_name]
             end
 
             @logger.info("Creating network interface nic#{iface_number}")
@@ -86,7 +92,40 @@ module VagrantPlugins
             end
           end
 
+          # Continue the middleware chain.
           @app.call(env)
+
+          # Configure interfaces that user requested. Machine should be up and
+          # running now.
+          networks_to_configure = []
+
+          adapters.each_with_index do |opts, slot_number|
+            # Skip configuring first interface. It's used for provisioning and
+            # it has to be available during provisioning - ifdown command is
+            # not acceptable here.
+            next if slot_number == 0
+
+            network = {
+              :interface => slot_number,
+              #:mac => ...,
+            }
+
+            if opts[:ip]
+              network = {
+                :type    => :static,
+                :ip      => opts[:ip],
+                :netmask => opts[:netmask],
+              }.merge(network)
+            else
+              network[:type] = :dhcp
+            end
+
+            networks_to_configure << network
+          end
+
+          env[:ui].info I18n.t("vagrant.actions.vm.network.configuring")
+          env[:machine].guest.capability(
+            :configure_networks, networks_to_configure)
         end
 
         private
