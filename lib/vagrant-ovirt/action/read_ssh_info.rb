@@ -55,11 +55,12 @@ module VagrantPlugins
           # Return the info
           # TODO: Some info should be configurable in Vagrantfile
           return {
-            :host          => ip_address.chomp!,
-            :port          => 22,
-            :username      => 'root',
-            :forward_agent => true,
-            :forward_x11   => true,
+            :host             => ip_address.chomp!,
+            :port             => config.ssh_port,
+            :username         => config.ssh_user,
+            :private_key_path => config.ssh_key_file,
+            :forward_agent    => true,
+            :forward_x11      => true,
           }
         end 
       end
