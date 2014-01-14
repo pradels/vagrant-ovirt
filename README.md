@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
     test_vm.vm.box = "ovirt"
     test_vm.vm.network :private_network,
       :ip => '10.20.30.40',
-      :ovirt__network_name => 'ovirt_network',
+      :ovirt__network_name => 'ovirt_network'
 
     test_vm.vm.provider :ovirt do |ovirt|
       ovirt.template = "Template name"
@@ -71,6 +71,9 @@ Vagrant.configure("2") do |config|
     ovirt.username = "Username"
     ovirt.password = "Secret"
     ovirt.datacenter = "Datacenter name"
+    ovirt.ssh_user = 'vagrant'
+    ovirt.ssh_key_file = '~/.ssh/vagrant'
+    ovirt.ssh_port = 22
   end
 end
 
@@ -83,6 +86,9 @@ This provider exposes quite a few provider-specific configuration options:
 * `url` - URL to management interface.
 * `username` - Username to access oVirt.
 * `password` - Password to access oVirt.
+* `ssh_key_file` - Private keyfile to use for ssh connection.
+* `ssh_user` - SSH username to use for ssh connection.
+* `ssh_port` - Port to use for ssh. Default is '22'.
 * `datacenter` - oVirt datacenter name, where machines will be created.
 * `cluster` - oVirt cluster name. Defaults to first cluster found.
 * `ip_command` - Shell command, which shoud return IP address string for
@@ -94,8 +100,7 @@ This provider exposes quite a few provider-specific configuration options:
 * `memory` - Amount of memory in MBytes. Defaults to 512 if not set.
 * `cpus` - Number of virtual cpus. Defaults to 1 if not set.
 * `template` - Name of template from which new VM should be created.
-* `quota` - Name of oVirt quota for VM. Defaults to first quota found in
-  datacenter.
+* `console` - Console type to use. Can be 'vnc' or 'spice'. Default is 'spice'
 
 Specific domain settings can be set for each domain separately in multi-VM
 environment. Example below shows a part of Vagrantfile, where specific options
