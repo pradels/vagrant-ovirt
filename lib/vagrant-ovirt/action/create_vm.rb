@@ -40,15 +40,6 @@ module VagrantPlugins
               :template_name => config.template
           end
 
-          # Get quota
-          if config.quota == nil
-            quota = env[:ovirt_client].quotas.first
-          else
-            quota = OVirtProvider::Util::Collection.find_matching(
-              env[:ovirt_client].quotas.all, config.quota)
-          end
-          raise Error::NoQuotaError if quota == nil
-
           # Output the settings we're going to use to the user
           env[:ui].info(I18n.t("vagrant_ovirt.creating_vm"))
           env[:ui].info(" -- Name:          #{name}")
@@ -56,7 +47,6 @@ module VagrantPlugins
           env[:ui].info(" -- Memory:        #{memory_size/1024}M")
           env[:ui].info(" -- Base box:      #{env[:machine].box.name}")
           env[:ui].info(" -- Template:      #{template.name}")
-          env[:ui].info(" -- Quota:         #{quota.name}")
           env[:ui].info(" -- Datacenter:    #{config.datacenter}")
           env[:ui].info(" -- Cluster:       #{cluster.name}")
 
@@ -67,7 +57,6 @@ module VagrantPlugins
               :memory   => memory_size*1024,
               :cluster  => cluster.id,
               :template => template.id,
-              :quota    => quota.id,
           }
 
           begin
