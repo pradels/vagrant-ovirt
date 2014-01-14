@@ -18,6 +18,7 @@ module VagrantPlugins
 
           # Gather some info about domain
           name = env[:domain_name]
+          console = config.console
           cpus = config.cpus
           memory_size = config.memory*1024
 
@@ -49,6 +50,7 @@ module VagrantPlugins
           env[:ui].info(" -- Template:      #{template.name}")
           env[:ui].info(" -- Datacenter:    #{config.datacenter}")
           env[:ui].info(" -- Cluster:       #{cluster.name}")
+          env[:ui].info(" -- Console:       #{console}")
 
           # Create oVirt VM.
           attr = {
@@ -57,6 +59,7 @@ module VagrantPlugins
               :memory   => memory_size*1024,
               :cluster  => cluster.id,
               :template => template.id,
+              :display  => {:type => console },
           }
 
           begin

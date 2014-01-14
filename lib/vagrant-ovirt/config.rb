@@ -15,10 +15,10 @@ module VagrantPlugins
       attr_accessor :memory
       attr_accessor :cpus
       attr_accessor :template
-      attr_accessor :quota
+      attr_accessor :console
 
       def initialize
-        @url       = UNSET_VALUE
+        @url        = UNSET_VALUE
         @username   = UNSET_VALUE
         @password   = UNSET_VALUE
         @datacenter = UNSET_VALUE
@@ -29,7 +29,7 @@ module VagrantPlugins
         @memory     = UNSET_VALUE
         @cpus       = UNSET_VALUE
         @template   = UNSET_VALUE
-        @quota      = UNSET_VALUE
+        @console    = UNSET_VALUE
       end
 
       def finalize!
@@ -46,10 +46,13 @@ module VagrantPlugins
         @memory = 512 if @memory == UNSET_VALUE
         @cpus = 1 if @cpus == UNSET_VALUE
         @template = 'Blank' if @template == UNSET_VALUE
-        @quota = nil if @quota == UNSET_VALUE
+        @console = 'spice' if @console == UNSET_VALUE
       end
 
       def validate(machine)
+        valid_console_types = ['vnc', 'spice']
+        raise Error::InvalidConsoleType,
+          :console => @console unless valid_console_types.include? @console
       end
     end
   end
