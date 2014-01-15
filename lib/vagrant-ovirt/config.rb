@@ -7,9 +7,6 @@ module VagrantPlugins
       attr_accessor :url
       attr_accessor :username
       attr_accessor :password
-      attr_accessor :ssh_user
-      attr_accessor :ssh_key_file
-      attr_accessor :ssh_port
       attr_accessor :datacenter
       attr_accessor :cluster
       attr_accessor :ip_command
@@ -24,9 +21,6 @@ module VagrantPlugins
         @url            = UNSET_VALUE
         @username       = UNSET_VALUE
         @password       = UNSET_VALUE
-        @ssh_user       = UNSET_VALUE
-        @ssh_key_file   = UNSET_VALUE
-        @ssh_port       = UNSET_VALUE
         @datacenter     = UNSET_VALUE
         @cluster        = UNSET_VALUE
         @ip_command     = UNSET_VALUE
@@ -42,8 +36,6 @@ module VagrantPlugins
         @url = nil if @url == UNSET_VALUE
         @username = nil if @username == UNSET_VALUE
         @password = nil if @password == UNSET_VALUE
-        @ssh_user = 'vagrant' if @ssh_user == UNSET_VALUE
-        @ssh_port = 22 if @ssh_port == UNSET_VALUE
         @datacenter = nil if @datacenter == UNSET_VALUE
         @cluster = nil if @cluster == UNSET_VALUE
         if @ip_command == UNSET_VALUE

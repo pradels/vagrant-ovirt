@@ -71,9 +71,6 @@ Vagrant.configure("2") do |config|
     ovirt.username = "Username"
     ovirt.password = "Secret"
     ovirt.datacenter = "Datacenter name"
-    ovirt.ssh_user = 'vagrant'
-    ovirt.ssh_key_file = '~/.ssh/vagrant'
-    ovirt.ssh_port = 22
   end
 end
 
@@ -86,9 +83,6 @@ This provider exposes quite a few provider-specific configuration options:
 * `url` - URL to management interface.
 * `username` - Username to access oVirt.
 * `password` - Password to access oVirt.
-* `ssh_key_file` - Private keyfile to use for ssh connection.
-* `ssh_user` - SSH username to use for ssh connection.
-* `ssh_port` - Port to use for ssh. Default is '22'.
 * `datacenter` - oVirt datacenter name, where machines will be created.
 * `cluster` - oVirt cluster name. Defaults to first cluster found.
 * `ip_command` - Shell command, which shoud return IP address string for
