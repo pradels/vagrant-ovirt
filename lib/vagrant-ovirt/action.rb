@@ -20,7 +20,7 @@ module VagrantPlugins
             b2.use SetNameOfDomain
             b2.use CreateVM
 
-            b2.use TimedProvision
+            b2.use Provision
             b2.use CreateNetworkInterfaces
 
             b2.use SetHostname
@@ -120,7 +120,6 @@ module VagrantPlugins
       autoload :DestroyVM, action_root.join("destroy_vm")
       autoload :ReadState, action_root.join("read_state")
       autoload :ReadSSHInfo, action_root.join("read_ssh_info")
-      autoload :TimedProvision, action_root.join("timed_provision")
       autoload :WaitTillUp, action_root.join("wait_till_up")
       autoload :SyncFolders, action_root.join("sync_folders")
       autoload :MessageAlreadyCreated, action_root.join("message_already_created")
