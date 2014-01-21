@@ -46,7 +46,6 @@ module VagrantPlugins
           env[:ui].info(" -- Name:          #{name}")
           env[:ui].info(" -- Cpus:          #{cpus}")
           env[:ui].info(" -- Memory:        #{memory_size/1024}M")
-          env[:ui].info(" -- Base box:      #{env[:machine].box.name}")
           env[:ui].info(" -- Template:      #{template.name}")
           env[:ui].info(" -- Datacenter:    #{config.datacenter}")
           env[:ui].info(" -- Cluster:       #{cluster.name}")
