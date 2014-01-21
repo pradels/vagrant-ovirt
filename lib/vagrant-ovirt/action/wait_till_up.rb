@@ -34,7 +34,7 @@ module VagrantPlugins
           # variable.
           first_interface = OVirtProvider::Util::Collection.find_matching(
             server.interfaces, 'nic1')
-          ip_command = "MAC=#{first_interface.mac} #{config.ip_command}"
+          ip_command = "#{config.ip_command} #{first_interface.mac}"
 
           # Wait for VM to obtain an ip address. Ip address is searched via
           # custom configurable 'ip_command', or by default in local arp table.

@@ -73,8 +73,7 @@ This provider exposes quite a few provider-specific configuration options:
 * `datacenter` - oVirt datacenter name, where machines will be created.
 * `cluster` - oVirt cluster name. Defaults to first cluster found.
 * `ip_command` - Shell command, which shoud return IP address string for
- MAC address specified in environment variable named $MAC. By default, this
- command searches IP in local arp table.
+ MAC address specified as the first parameter in the call.
 
 ### Domain Specific Options
 

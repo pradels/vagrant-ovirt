@@ -38,9 +38,7 @@ module VagrantPlugins
         @password = nil if @password == UNSET_VALUE
         @datacenter = nil if @datacenter == UNSET_VALUE
         @cluster = nil if @cluster == UNSET_VALUE
-        if @ip_command == UNSET_VALUE
-          @ip_command = 'arp -an | grep -i $MAC | sed "s/.*(\(.*\)).*/\1/"'
-        end
+        @ip_command = nil if @ip_command == UNSET_VALUE
 
         # Domain specific settings.
         @memory = 512 if @memory == UNSET_VALUE

@@ -40,7 +40,7 @@ module VagrantPlugins
           # TODO place code for obtaining IP in one place.
           first_interface = OVirtProvider::Util::Collection.find_matching(
             server.interfaces, 'nic1')
-          ip_command = "MAC=#{first_interface.mac} #{config.ip_command}"
+          ip_command = "#{config.ip_command} #{first_interface.mac}"
 
           for i in 1..3
             # Get IP address via ip_command.

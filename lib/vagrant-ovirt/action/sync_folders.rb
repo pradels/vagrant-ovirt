@@ -25,6 +25,14 @@ module VagrantPlugins
             # avoid creating an additional directory with rsync
             hostpath = "#{hostpath}/" if hostpath !~ /\/$/
 
+            # on windows rsync.exe requires cygdrive-style paths.
+            # assumes: /c/...
+            # Should be msysgit and cygwin compatible if /etc/fstab in cygwin contains:
+            #    none / cygdrive binary,posix=0,user 0 0
+            if Vagrant::Util::Platform.windows?
+              hostpath = hostpath.gsub(/^(\w):/) { "/#{$1}" }
+            end
+
             env[:ui].info(I18n.t("vagrant_ovirt.rsync_folder",
                                 :hostpath => hostpath,
                                 :guestpath => guestpath))
@@ -35,7 +43,7 @@ module VagrantPlugins
 
             # Rsync over to the guest path using the SSH info
             command = [
-              "rsync", "--verbose", "--archive", "-z",
+              "rsync", "--verbose", "--archive", "-z", "--owner", "--perms",
               "--exclude", ".vagrant/",
               "-e", "ssh -p #{ssh_info[:port]} -o StrictHostKeyChecking=no -i '#{ssh_info[:private_key_path][0]}'",
               hostpath,
