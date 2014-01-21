@@ -8,10 +8,7 @@ allowing Vagrant to control and provision machines in oVirt and RHEV.
 In this document, both oVirt and RHEV names are used interchangeably and
 represent the same platform on top of which this provider should work.
 
-**Note:** Actual version (0.0.2) is still a development one. It was developed
-and tested on RHEV 3.1 only.
-
-## Features (Version 0.0.2)
+## Features (Version 0.1.0)
 
 * Vagrant `up` and `destroy` commands.
 * Create and boot oVirt machines from templates.
