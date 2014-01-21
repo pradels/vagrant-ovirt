@@ -234,39 +234,6 @@ The box is a tarball containing:
 * `metadata.json` file describing box image (just a provider name).
 * `Vagrantfile` that does default settings for the provider-specific configuration for this provider.
 
-## Development
-
-To work on the `vagrant-ovirt` plugin, clone this repository out, and use
-[Bundler](http://gembundler.com) to get the dependencies:
-
-```
-$ git clone https://github.com/pradels/vagrant-ovirt.git
-$ cd vagrant-ovirt
-$ bundle install
-```
-
-Once you have the dependencies, verify the unit tests pass with `rake`:
-
-```
-$ bundle exec rake
-```
-
-If those pass, you're ready to start developing the plugin. You can test
-the plugin without installing it into your Vagrant environment by just
-creating a `Vagrantfile` in the top level of this directory (it is gitignored)
-that uses it. Don't forget to add following line at the beginning of your
-`Vagrantfile` while in development mode:
-
-```ruby
-Vagrant.require_plugin "vagrant-ovirt"
-```
-
-Now you can use bundler to execute Vagrant:
-
-```
-$ bundle exec vagrant up --provider=ovirt
-```
-
 ## Contributing
 
 1. Fork it
