@@ -8,10 +8,7 @@ allowing Vagrant to control and provision machines in oVirt and RHEV.
 In this document, both oVirt and RHEV names are used interchangeably and
 represent the same platform on top of which this provider should work.
 
-**Note:** Actual version (0.0.2) is still a development one. It was developed
-and tested on RHEV 3.1 only.
-
-## Features (Version 0.0.2)
+## Features (Version 0.1.0)
 
 * Vagrant `up` and `destroy` commands.
 * Create and boot oVirt machines from templates.
@@ -38,41 +35,31 @@ $ vagrant plugin install vagrant-ovirt
 
 ## Vagrant Project Preparation
 
-After installing the plugin (instructions above), the quickest way to get
-started is to actually use a dummy oVirt box and specify all the details
-manually within a `config.vm.provider` block. So first, add the dummy box using
-any name you want:
-
-```
-$ vagrant box add ovirt https://raw.github.com/pradels/vagrant-ovirt/master/example_box/ovirt.box
-```
-
-And then make a Vagrantfile that looks like the following, filling in
+Create a Vagrantfile that looks like the following, filling in
 your information where necessary.
 
 ```ruby
-Vagrant.configure("2") do |config|
-  config.vm.define :test_vm do |test_vm|
-    test_vm.vm.box = "ovirt"
-    test_vm.vm.network :private_network,
-      :ip => '10.20.30.40',
-      :ovirt__network_name => 'ovirt_network',
+Vagrant.configure('2') do |config|
+  config.vm.box = 'ovirt'
+  config.vm.box_url = 'https://raw.github.com/pradels/vagrant-ovirt/master/example_box/ovirt.box'
 
-    test_vm.vm.provider :ovirt do |ovirt|
-      ovirt.template = "Template name"
-      ovirt.quota = "Quota name"
-      ovirt.cpus = 1
-      ovirt.memory = 1024
-    end
-  end
+  config.vm.network :private_network, 
+    :ip => '192.168.56.100', :nictype => 'virtio', :netmask => '255.255.255.0' #normal network configuration
+    :ovirt__ip => '10.101.55.72', :ovirt__network_name => 'ovirtmgmt', :ovirt__gateway => '10.101.55.1', # oVirt specific information, overwrites previous on oVirt provider
+    
 
   config.vm.provider :ovirt do |ovirt|
-    ovirt.url = "https://ovirt.example.com:443"
-    ovirt.username = "Username"
-    ovirt.password = "Secret"
-    ovirt.datacenter = "Datacenter name"
+    ovirt.template = 'template'
+    ovirt.cpus = 1
+    ovirt.memory = 1024
+    ovirt.console = 'vnc' #could also be 'spice'
+    ovirt.url = 'https://youroVirtmaster:443'
+    ovirt.username = 'username'
+    ovirt.password = 'password'
+    ovirt.datacenter = 'datacenter'
+    #ovirt.ip_command = 'echo ipaddress'
   end
-end
+
 
 ```
 
@@ -86,16 +73,14 @@ This provider exposes quite a few provider-specific configuration options:
 * `datacenter` - oVirt datacenter name, where machines will be created.
 * `cluster` - oVirt cluster name. Defaults to first cluster found.
 * `ip_command` - Shell command, which shoud return IP address string for
- MAC address specified in environment variable named $MAC. By default, this
- command searches IP in local arp table.
+ MAC address specified as the first parameter in the call.
 
 ### Domain Specific Options
 
 * `memory` - Amount of memory in MBytes. Defaults to 512 if not set.
 * `cpus` - Number of virtual cpus. Defaults to 1 if not set.
 * `template` - Name of template from which new VM should be created.
-* `quota` - Name of oVirt quota for VM. Defaults to first quota found in
-  datacenter.
+* `console` - Console type to use. Can be 'vnc' or 'spice'. Default is 'spice'
 
 Specific domain settings can be set for each domain separately in multi-VM
 environment. Example below shows a part of Vagrantfile, where specific options
@@ -127,6 +112,56 @@ Vagrant needs to know that we want to use oVirt and not default VirtualBox.
 That's why there is `--provider=ovirt` option specified. Other way to tell
 Vagrant to use oVirt provider is to setup environment variable
 `export VAGRANT_DEFAULT_PROVIDER=ovirt`.
+
+## Multiple provider Vagrantfile with Provisioners Example
+
+This example allows you to spin up a box under virtualbox using `$ vagrant up` as well as a VM under oVirt using a template with `$ vagrant up --provider=ovirt`
+Note, the network information will differ between the two. Under virtualbox, it should come up with an IP of `192.168.56.100`. Under oVirt it should come up as `10.101.55.72` if successful.
+
+```ruby
+Vagrant.configure('2') do |config|
+  config.vm.box = 'mybox'
+
+   config.vm.network :private_network, 
+    :ip => '192.168.56.100', :nictype => 'virtio', :netmask => '255.255.255.0' #normal network configuration
+    :ovirt__ip => '10.101.55.72', :ovirt__network_name => 'ovirtmgmt', :ovirt__gateway => '10.101.55.1', # oVirt specific information, overwrites previous on oVirt provider
+    
+  config.vm.provider :virtualbox do |vb|
+    vb.customize [
+      # Key                Value
+      'modifyvm',          :id, 
+      '--cpuexecutioncap', '90',
+      '--memory',          '1376',
+      '--nictype2',        'virtio',
+    ]
+  end
+
+
+  config.vm.provider :ovirt do |ovirt|
+    ovirt.template = 'template'
+    ovirt.cpus = 1
+    ovirt.memory = 1024
+    ovirt.console = 'vnc' #could also be 'spice'
+    ovirt.url = 'https://youroVirtmaster:443'
+    ovirt.username = 'username'
+    ovirt.password = 'password'
+    ovirt.datacenter = 'datacenter'
+    #ovirt.ip_command = 'echo ipaddress'
+  end
+
+  config.vm.provision 'shell' do |shell|
+    shell.inline = 'uname -a > /var/log/something.log 2>&1'
+  end
+
+  config.vm.provision :puppet do |puppet|
+    puppet.options = [
+      "--environment development", 
+      '--hiera_config=/etc/puppet/hiera/hiera.yaml', 
+    ]
+    puppet.manifests_path = './manifests'
+    puppet.manifest_file = 'default.pp'
+  end
+```
 
 ### How Project Is Created
 
@@ -160,7 +195,7 @@ An examples of network interface definitions:
 In example below, one additional network interface is created for VM test_vm1.
 Interface is connected to `ovirt_networkname` network and configured to ip
 address `10.20.30.40/24`. If you omit ip address, interface will be configured
-dynamicaly via dhcp.
+dynamically via dhcp.
 
 
 ## Obtaining Domain IP Address
@@ -194,39 +229,6 @@ The box is a tarball containing:
 
 * `metadata.json` file describing box image (just a provider name).
 * `Vagrantfile` that does default settings for the provider-specific configuration for this provider.
-
-## Development
-
-To work on the `vagrant-ovirt` plugin, clone this repository out, and use
-[Bundler](http://gembundler.com) to get the dependencies:
-
-```
-$ git clone https://github.com/pradels/vagrant-ovirt.git
-$ cd vagrant-ovirt
-$ bundle install
-```
-
-Once you have the dependencies, verify the unit tests pass with `rake`:
-
-```
-$ bundle exec rake
-```
-
-If those pass, you're ready to start developing the plugin. You can test
-the plugin without installing it into your Vagrant environment by just
-creating a `Vagrantfile` in the top level of this directory (it is gitignored)
-that uses it. Don't forget to add following line at the beginning of your
-`Vagrantfile` while in development mode:
-
-```ruby
-Vagrant.require_plugin "vagrant-ovirt"
-```
-
-Now you can use bundler to execute Vagrant:
-
-```
-$ bundle exec vagrant up --provider=ovirt
-```
 
 ## Contributing
 

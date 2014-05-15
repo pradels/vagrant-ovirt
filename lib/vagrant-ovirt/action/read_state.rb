@@ -29,7 +29,7 @@ module VagrantPlugins
           end
 
           # Return the state
-          return server.status.to_sym
+          return server.status
         end
       end
     end

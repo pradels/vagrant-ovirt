@@ -28,9 +28,6 @@ module VagrantPlugins
 
           # First interface is for provisioning, so this slot is not usable.
           # This interface should be available already from template.
-          adapters[0] = {
-            :network_name => 'rhevm'
-          }
 
           env[:machine].config.vm.networks.each do |type, options|
             # We support private and public networks only. They mean both the
@@ -62,7 +59,7 @@ module VagrantPlugins
 
           # Create each interface as new domain device
           adapters.each_with_index do |opts, slot_number|
-            next if slot_number == 0
+            next if slot_number == 0 or opts.nil?
             iface_number = slot_number + 1
 
             #require 'pp'
@@ -82,9 +79,7 @@ module VagrantPlugins
               machine.add_interface(
                 :name    => "nic#{iface_number}",
                 :network => network.id,
-
-                # TODO This should be configurable in Vagrantfile.
-                :interface => 'virtio',
+                :interface => network.name,
               )
             rescue => e
               raise Errors::AddInterfaceError,
@@ -115,6 +110,7 @@ module VagrantPlugins
                 :type    => :static,
                 :ip      => opts[:ip],
                 :netmask => opts[:netmask],
+                :gateway => opts[:gateway],
               }.merge(network)
             else
               network[:type] = :dhcp

@@ -40,7 +40,7 @@ module VagrantPlugins
           # TODO place code for obtaining IP in one place.
           first_interface = OVirtProvider::Util::Collection.find_matching(
             server.interfaces, 'nic1')
-          ip_command = "MAC=#{first_interface.mac}; #{config.ip_command}"
+          ip_command = "#{config.ip_command} #{first_interface.mac}"
 
           for i in 1..3
             # Get IP address via ip_command.
@@ -55,11 +55,12 @@ module VagrantPlugins
           # Return the info
           # TODO: Some info should be configurable in Vagrantfile
           return {
-            :host          => ip_address.chomp!,
-            :port          => 22,
-            :username      => 'root',
-            :forward_agent => true,
-            :forward_x11   => true,
+            :host             => ip_address.chomp!,
+            :port             => machine.config.ssh.guest_port,
+            :username         => machine.config.ssh.username,
+            :private_key_path => machine.config.ssh.private_key_path,
+            :forward_agent    => machine.config.ssh.forward_agent,
+            :forward_x11      => machine.config.ssh.forward_x11,
           }
         end 
       end
