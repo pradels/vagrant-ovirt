@@ -33,7 +33,13 @@ module VagrantPlugins
           conn_attr[:ovirt_url] = "#{config.url}/api"
           conn_attr[:ovirt_username] = config.username if config.username
           conn_attr[:ovirt_password] = config.password if config.password
+          conn_attr[:ovirt_ca_no_verify] = config.ca_no_verify if config.ca_no_verify
 
+          if conn_attr[:ovirt_ca_no_verify]
+            @logger.info("Not verifying SSL certificates.")
+          else
+            @logger.debug("Verifying SSL certificates.")
+          end
           # We need datacenter id in fog connection initialization. But it's
           # much simpler to use datacenter name in Vagrantfile. So get
           # datacenter id here from rbovirt client before connecting to fog.
@@ -74,7 +80,8 @@ module VagrantPlugins
             credentials[:ovirt_username],
             credentials[:ovirt_password],
             credentials[:ovirt_url],
-            credentials[:ovirt_datacenter],
+            { :datacenter_id => credentials[:ovirt_datacenter],
+              :ca_no_verify => credentials[:ovirt_ca_no_verify] }
           )
         end
       end

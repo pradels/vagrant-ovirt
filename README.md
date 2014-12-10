@@ -74,6 +74,7 @@ This provider exposes quite a few provider-specific configuration options:
 * `cluster` - oVirt cluster name. Defaults to first cluster found.
 * `ip_command` - Shell command, which shoud return IP address string for
  MAC address specified as the first parameter in the call.
+* `ca_no_verify` - Set to `true` to not verify TLS certificates.
 
 ### Domain Specific Options
 
